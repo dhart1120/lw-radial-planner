@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Settings } from "lucide-react"
 
 export default function Header() {
   return (
@@ -12,8 +13,8 @@ export default function Header() {
       {/* Row: Button + Instructions */}
       <div className="flex items-center gap-4">
         {/* Settings Button */}
-        <Button className="w-14 h-14 flex items-center justify-center">
-          
+        <Button variant="default" size="icon-xl">
+          <Settings className="size-8" />
         </Button>
 
         {/* Instructions TEXT — larger, aligned right of button */}
