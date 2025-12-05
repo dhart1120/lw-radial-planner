@@ -2,8 +2,9 @@ import CircularSlider from "@fseehawer/react-circular-slider";
 import { formatDuration } from "../../utils/timeUtils";
 
 type TimerDialProps = {
-    buildTime: number // in minutes
-    onChange: (value: number) => void
+    buildTime: number; // in minutes
+    maxDays: number;
+    onChange: (value: number) => void;
 }
 
 type DialValueProps = {
@@ -22,7 +23,9 @@ function DialValue({ value, completionTime }: DialValueProps) {
   );
 }
 
-export default function TimerDial({buildTime, onChange}: TimerDialProps) {
+export default function TimerDial({buildTime, maxDays, onChange}: TimerDialProps) {
+    const maxDaysInMinutes = maxDays * 24 * 60;
+
     return (
         <CircularSlider
             label={formatDuration(buildTime)}
@@ -31,7 +34,7 @@ export default function TimerDial({buildTime, onChange}: TimerDialProps) {
             progressColorFrom="#38bdf8"
             progressColorTo="#0284c7"
             min={0}
-            max={14400}
+            max={maxDaysInMinutes}
             renderLabelValue={<DialValue value={formatDuration(buildTime)} />}
             onChange={value => onChange((typeof value == "string") ? parseInt(value) : value )}
         />

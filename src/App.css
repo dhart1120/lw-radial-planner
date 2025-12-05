@@ -73,7 +73,9 @@
   --accent: #0284c7;
   --accent-foreground: #ffffff;
 
-  --destructive: #ef4444;
+  --destructive: #ef4444;        /* tailwind red-500 */
+  --destructive-foreground: #fff;
+  
   --border: #e5e7eb;
   --input: #e5e7eb;
   --ring: #38bdf8;                    /* sky-400 */

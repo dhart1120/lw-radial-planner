@@ -41,6 +41,12 @@ const buttonVariants = cva(
           "hover:text-primary-foreground shadow-sm hover:shadow-md " +
           "active:shadow-sm active:translate-y-[1px] " +
           "focus-visible:border-primary-foreground",
+
+        "outline-destructive":
+          "border border-destructive text-destructive hover:bg-primary-light " +
+          "hover:text-destructive-foreground shadow-sm hover:shadow-md " +
+          "active:shadow-sm active:translate-y-[1px] " +
+          "focus-visible:border-destructive-foreground",
       },
       size: {
         default: "h-10 px-6 has-[>svg]:px-5",

@@ -26,7 +26,7 @@ export default function ClockDisplay({ date, offset, label }: ClockDisplayProps)
   });
 
   return (
-    <div className="bg-neutral-800 text-slate-200 rounded-xl px-5 py-4 shadow-lg text-center">
+    <div className="bg-neutral-800 text-slate-200 rounded-xl px-3 py-2 shadow-lg text-center">
       {label}
       <div className="text-2xl font-semibold mt-1">{timeStr}</div>
       <div className="text-sm text-slate-400">{dateStr}</div>
