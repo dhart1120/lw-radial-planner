@@ -4,6 +4,7 @@ import { addSeconds, formatTimeAndDate, getUTCTime } from "../../utils/timeUtils
 import {
   Popover,
   PopoverAnchor,
+  PopoverClose,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
@@ -57,9 +58,12 @@ export default function AddBuildTask({buildTime, currentTime, onAddToPlan, onSta
                         </PopoverAnchor>
                     </PopoverTrigger>
                     <PopoverContent side="right" className="flex flex-row gap-2 w-auto">
-                        <QueueIcon taskType={TASK_TYPES.schedule} onClick={() => setTaskType(TASK_TYPES.schedule)}/>
-                        <QueueIcon taskType={TASK_TYPES.builder} onClick={() => setTaskType(TASK_TYPES.builder)}/>
-                        <QueueIcon taskType={TASK_TYPES.research} onClick={() => setTaskType(TASK_TYPES.research)}/>
+                        <PopoverClose asChild>
+                            <QueueIcon taskType={TASK_TYPES.builder} onClick={() => setTaskType(TASK_TYPES.builder)}/>
+                        </PopoverClose>
+                        <PopoverClose asChild>
+                            <QueueIcon taskType={TASK_TYPES.research} onClick={() => setTaskType(TASK_TYPES.research)}/>
+                        </PopoverClose>
                     </PopoverContent>
                 </Popover>
 

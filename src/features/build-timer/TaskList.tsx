@@ -64,11 +64,11 @@ export function TaskList({ tasks, onStartTask, onDeleteTask }: TaskListProps) {
                                         <span className="text-sm">Original time: <span className="text-accent">{formatDuration(task.time)}</span></span>
                                         {task.startAt ? (
                                             <>
-                                                <span className="text-sm">Started at: <span className="text-accent">{formatTimeAndDate(task.startAt, 0)}</span></span>
-                                                <span className="text-sm">Completes at: <span className="text-accent">{completionTimeUser}</span></span>
+                                                <span className="text-sm">Started <span className="text-accent">{formatTimeAndDate(task.startAt, 0)}</span></span>
+                                                <span className="text-sm">Completes <span className="text-accent">{completionTimeUser}</span></span>
                                             </>
                                         ) : (
-                                            <span className="text-sm">Completes at approx: <span className="text-accent">{completionTimeUser}</span></span>
+                                            <span className="text-sm">Completes approx <span className="text-accent">{completionTimeUser}</span></span>
                                         )}
                                         
                                         

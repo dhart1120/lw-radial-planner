@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
+  PopoverClose,
   PopoverAnchor,
   PopoverContent,
   PopoverTrigger,
@@ -19,6 +20,7 @@ export default function Header({config, onUpdateConfig}: HeaderProps) {
     numOfBuilders: useRef<HTMLInputElement | null>(null),
     numOfTechCenter: useRef<HTMLInputElement | null>(null),
     maxDaysOnDial: useRef<HTMLInputElement | null>(null),
+    serverTimeOffset: useRef<HTMLInputElement | null>(null),
   } satisfies Record<keyof Config, React.RefObject<HTMLInputElement | null>>;
 
   const handleUpdate = () => {
@@ -43,7 +45,7 @@ export default function Header({config, onUpdateConfig}: HeaderProps) {
 
       {/* Title */}
       <h1 className="text-3xl tracking-wide uppercase font-bold text-slate-200 text-center">
-        Build Timer
+           Build Timer
       </h1>
 
       {/* Row: Button + Instructions */}
@@ -104,13 +106,27 @@ export default function Header({config, onUpdateConfig}: HeaderProps) {
                             px-2 text-center text-slate-100
                             focus:outline-none focus:ring-2 focus:ring-sky-500"
                 />
+                <label htmlFor="maxDays" className="self-center text-slate-300">
+                  Server Offset
+                </label>
+                <input
+                  ref={refs.serverTimeOffset}
+                  id="serverTimeOffset"
+                  type="number"
+                  defaultValue={config.serverTimeOffset}
+                  className="h-8 rounded bg-neutral-800 border border-sky-600
+                            px-2 text-center text-slate-100
+                            focus:outline-none focus:ring-2 focus:ring-sky-500"
+                />
               </div>
 
               <div className="space-y-2">
-                <Button onClick={handleUpdate} className="w-full">Update</Button>
-                <Button onClick={handleReset} variant="destructive" className="w-full">
-                  Reset
-                </Button>
+                <PopoverClose asChild>
+                  <Button onClick={handleUpdate} className="w-full">Update</Button>
+                </PopoverClose>
+                <PopoverClose asChild>
+                  <Button onClick={handleReset} variant="destructive" className="w-full">Reset</Button>
+                </PopoverClose>
               </div>
             </div>
           </PopoverContent>

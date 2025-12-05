@@ -99,7 +99,7 @@ function App() {
     <Header config={config} onUpdateConfig={handleUpdateConfig} />
     <div className="w-full flex flex-nowrap gap-5 mb-5">
       <div className="flex-1">
-        <ClockDisplay date={utcDate} offset={+4} label={<h2>Server Time</h2>} />
+        <ClockDisplay date={utcDate} offset={config.serverTimeOffset} label={<h2>Server Time</h2>} />
       </div>
       <div className="flex-1">
         <ClockDisplay date={localDate} label={<h2>Local Time</h2>} />

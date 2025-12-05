@@ -1,73 +1,38 @@
-# React + TypeScript + Vite
+# Last War Radial Planner
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This app is a simple planning tool for the mobile game [Last War: Survival](https://www.lastwar.com/). The game is primarily a base-building and strategy game, with time management as a central component. This app allows users to **plan lists of upgrades and the time required to complete them.** Completing upgrades during specific time periods or on certain days of the week is a key mechanic of the game, and the math can become tricky when managing **multiple queues and concurrent upgrades**.
 
-Currently, two official plugins are available:
+[Demo Link](http://radial-planner-demo.s3-website.us-east-2.amazonaws.com/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+![Screenshots](/docs/images/screenshot.png "Screenshots")
 
-## React Compiler
+## Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+This is a React + TypeScript app created with Vite. Components are built using shadcn and tailwindcss. It doesn't require a backend server and uses `localStorage` for user data. Typical use cases only need to retain data for a few hours up to a few weeks.
 
-## Expanding the ESLint configuration
+```shell
+# install dependencies
+npm install
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+# start the development server with hot module swapping
+npm run dev
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+# create the /dist folder for deployment
+npm run build
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# preview the production build
+npm run preview
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Future Ideas
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+A list of potential features that would improve the app:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+* Include “Build Now” and “Research Now” charges based on total build time
+  * Configure completion time to include these for new tasks
+  * Allow a user to apply a charge to an in-progress task
+* Button/modal to update a task’s settings after it has been added to a queue
+* Improve the model so the number of builders / research centers affects concurrent tasks
+* More useful support for the Schedule tab
+* Improved entry method for **precision**
+* **Fix:** Modals don't close on selection/update

@@ -19,6 +19,7 @@ export function formatTimeAndDate(utcDate: Date, offsetMinutes: number): string 
   const localDate = new Date(localMs);
 
   const date = localDate.toLocaleDateString(undefined, {
+    weekday: "short",
     month: "short",
     day: "numeric",
   });

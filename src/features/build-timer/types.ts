@@ -1,17 +1,18 @@
 import buildIcon from "../../assets/images/build.png"
 import researchIcon from "../../assets/images/research.png"
-import scheduleIcon from "../../assets/images/schedule.png"
 
 export type Config = {
     numOfBuilders: number;
     numOfTechCenter: number;
     maxDaysOnDial: number;
+    serverTimeOffset: number;
 }
 
 export const defaultConfig: Config = {
   numOfBuilders: 2,
   numOfTechCenter: 2,
-  maxDaysOnDial: 10
+  maxDaysOnDial: 10,
+  serverTimeOffset: 4
 }
 
 export type Task = {
@@ -24,15 +25,9 @@ export type Task = {
 }
 
 export const TASK_TYPES = {
-    schedule: {
-        queue: "schedule",
-        label: "Schedule",
-        icon: scheduleIcon,
-        placeholderTaskName: "Take over city"
-    },
     builder: {
         queue: "builder",
-        label: "Builder",
+        label: "Build",
         icon: buildIcon,
         placeholderTaskName: "Upgrade HQ to 30"
     },
@@ -44,5 +39,5 @@ export const TASK_TYPES = {
     },
 } as const;
 
-export type TaskQueue = keyof typeof TASK_TYPES;   // "schedule" | "builder" | "research"
+export type TaskQueue = keyof typeof TASK_TYPES;   // "builder" | "research"
 export type TaskType = (typeof TASK_TYPES)[TaskQueue];
