@@ -180,7 +180,8 @@ function buildProbabilityBuckets(
 }
 
 function buildChartPoints(mean: number, sigma: number, target?: number): Array<{ quantity: number; probability: number }> {
-  const maxQuantity = Math.max(mean + 3 * sigma, target ?? 0, 30);
+  const unclampedMax = Math.max(mean + 3 * sigma, 30);
+  const maxQuantity = target !== undefined ? Math.max(0, target) : unclampedMax;
   const safeMax = Number.isFinite(maxQuantity) ? maxQuantity : mean;
   const step = Math.max(1, Math.round(safeMax / 50));
 
