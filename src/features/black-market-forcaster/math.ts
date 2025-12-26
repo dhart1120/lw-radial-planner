@@ -1,5 +1,7 @@
 import forecasterData from "./data.json";
 
+export type ForecasterData = typeof forecasterData;
+
 type TierId = keyof typeof forecasterData.tiers;
 
 type ItemOccurrence = {
@@ -196,7 +198,7 @@ function buildChartPoints(mean: number, sigma: number, target?: number): Array<{
 }
 
 export type ForecasterInputs = {
-  itemId: string;
+  itemId: keyof ForecasterData["items"];
   setsPerEvent: number;
   targetQuantity?: number;
 };

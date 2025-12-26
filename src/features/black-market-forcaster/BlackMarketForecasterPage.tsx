@@ -10,30 +10,11 @@ import {
   runForecaster,
   type ForecasterData,
 } from "./math";
+import { isItemInCatalog, listItems, type ForecasterItem } from "./itemCatalog";
 
 type AnalysisMode = "buy-all" | "target";
 
-type SupportedItem = {
-  id: string;
-  dataItemId: keyof ForecasterData["items"];
-  label: string;
-  description: string;
-};
-
-const supportedItems: SupportedItem[] = [
-  {
-    id: "ew-choice-shards",
-    dataItemId: "hero_weapon_shard_choice_chest_ii",
-    label: "EW Choice Shards (Season 1)",
-    description: "Exclusive Weapon shard choice chest odds across free, discounted, and regular slots.",
-  },
-  {
-    id: "ur-hero-shards",
-    dataItemId: "ur_hero_shard",
-    label: "UR Hero Shards",
-    description: "Baseline UR shard drops used by alliance planners and budget watchers.",
-  },
-];
+const itemCatalog = listItems();
 
 const numberFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
 const oneDecimalFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
@@ -199,7 +180,7 @@ function ProbabilityChart({ data }: ProbabilityChartProps) {
 }
 
 export function BlackMarketForecasterPage() {
-  const [selectedItem, setSelectedItem] = useState<SupportedItem>(supportedItems[0]);
+  const [selectedItem, setSelectedItem] = useState<ForecasterItem>(itemCatalog[0]);
   const [eventDays, setEventDays] = useState<number>(forecasterData.eventLengthDays ?? 28);
   const [refreshesPerDay, setRefreshesPerDay] = useState<number>(8);
   const [startingCurrency, setStartingCurrency] = useState<number>(0);
@@ -213,11 +194,11 @@ export function BlackMarketForecasterPage() {
   const results = useMemo(
     () =>
       runForecaster({
-        itemId: selectedItem.dataItemId,
+        itemId: selectedItem.id,
         setsPerEvent,
         targetQuantity: analysisMode === "target" ? targetQuantity : undefined,
       }),
-    [selectedItem.dataItemId, setsPerEvent, analysisMode, targetQuantity],
+    [selectedItem.id, setsPerEvent, analysisMode, targetQuantity],
   );
 
   const costPerUnit = results.mean > 0 ? results.expectedCost / results.mean : 0;
@@ -275,22 +256,34 @@ export function BlackMarketForecasterPage() {
 
       <section className="rounded-2xl border border-slate-800 bg-neutral-900/70 p-6 shadow-lg">
         <div className="grid gap-4 md:grid-cols-2">
-          <InputField label="Item" helper="Hardcoded Season 1 odds">
-            <select
-              className={inputStyle}
-              value={selectedItem.id}
-              onChange={(event) => {
-                const next = supportedItems.find((item) => item.id === event.target.value);
-                if (next) setSelectedItem(next);
-              }}
-            >
-              {supportedItems.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.label}
-                </option>
+          <InputField label="Item" helper="Season 1 catalog (tap to select)">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+              {itemCatalog.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setSelectedItem(item)}
+                  className={
+                    "group flex flex-col items-center gap-2 rounded-xl border px-3 py-3 text-sm font-semibold transition " +
+                    (selectedItem.id === item.id
+                      ? "border-sky-400 bg-sky-500/15 text-sky-100 shadow"
+                      : "border-slate-700 bg-neutral-900/70 text-slate-200 hover:border-sky-500/70")
+                  }
+                >
+                  <img
+                    src={item.icon}
+                    alt={item.name}
+                    className="h-12 w-12 rounded-lg bg-neutral-800 object-contain p-1 shadow-inner"
+                    loading="lazy"
+                    onError={(event) => {
+                      if (!isItemInCatalog(item.id)) return;
+                      event.currentTarget.style.opacity = "0.3";
+                    }}
+                  />
+                  <span className="text-center leading-tight group-hover:text-sky-100">{item.name}</span>
+                </button>
               ))}
-            </select>
-            <p className="text-sm text-slate-400">{selectedItem.description}</p>
+            </div>
           </InputField>
 
           <InputField label="Analysis mode" helper="Expected value vs target budgeting">
