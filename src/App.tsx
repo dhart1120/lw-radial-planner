@@ -1,4 +1,4 @@
-import { NavLink, Route, Routes } from "react-router-dom";
+import { NavLink, Route, Routes, useLocation } from "react-router-dom";
 import "./App.css";
 import { BlackMarketForecasterPage } from "./features/black-market-forcaster/BlackMarketForecasterPage";
 import { RadialPlannerPage } from "./features/build-timer/RadialPlannerPage";
@@ -13,30 +13,32 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   ].join(" ");
 
 function App() {
+  const { pathname } = useLocation();
+  const isHome = pathname === "/";
+
   return (
     <div className="min-h-screen bg-background text-foreground text-left">
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-8 text-left">
-        <header className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-800 bg-neutral-900/70 px-5 py-4 shadow-lg">
-          <div className="space-y-1">
-            <p className="text-xs uppercase tracking-[0.35em] text-slate-400">
-              LWS Tools
-            </p>
-            <h1 className="text-xl font-bold text-slate-100">
-              Planner &amp; Forecaster
-            </h1>
-          </div>
-          <nav className="flex flex-wrap gap-2">
-            <NavLink to="/" className={navLinkClass}>
-              Home
-            </NavLink>
-            <NavLink to="/radial-planner" className={navLinkClass}>
-              Radial Planner
-            </NavLink>
-            <NavLink to="/bm-forecaster" className={navLinkClass}>
-              BM Forecaster
-            </NavLink>
-          </nav>
-        </header>
+        {!isHome && (
+          <header className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-800 bg-neutral-900/70 px-5 py-4 shadow-lg">
+            <div className="space-y-1">
+              <p className="text-xs uppercase tracking-[0.35em] text-slate-400">
+                LWS Tools
+              </p>
+              <NavLink to="/" className="text-xl font-bold text-slate-100 hover:text-sky-200">
+                Planner &amp; Forecaster
+              </NavLink>
+            </div>
+            <nav className="flex flex-wrap gap-2">
+              <NavLink to="/radial-planner" className={navLinkClass}>
+                Radial Planner
+              </NavLink>
+              <NavLink to="/bm-forecaster" className={navLinkClass}>
+                BM Forecaster
+              </NavLink>
+            </nav>
+          </header>
+        )}
 
         <main className="pb-10">
           <Routes>
