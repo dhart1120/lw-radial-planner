@@ -9,7 +9,7 @@ type FeatureLink = {
 
 const features: FeatureLink[] = [
   {
-    title: "Radial Planner",
+    title: "Build Timer",
     description: "Plan and schedule your build timers with dial, queues, and live clocks.",
     to: "/radial-planner",
     badge: "Live",

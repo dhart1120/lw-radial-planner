@@ -31,7 +31,7 @@ function App() {
             </div>
             <nav className="flex flex-wrap gap-2">
               <NavLink to="/radial-planner" className={navLinkClass}>
-                Radial Planner
+                Build Timer
               </NavLink>
               <NavLink to="/bm-forecaster" className={navLinkClass}>
                 BM Forecaster

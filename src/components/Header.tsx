@@ -43,11 +43,6 @@ export default function Header({config, onUpdateConfig}: HeaderProps) {
   return (
     <header className="flex flex-col gap-4 mb-6">
 
-      {/* Title */}
-      <h1 className="text-3xl tracking-wide uppercase font-bold text-slate-200 text-center">
-           Build Timer
-      </h1>
-
       {/* Row: Button + Instructions */}
       <div className="flex items-center gap-4">
         {/* Settings Button */}
