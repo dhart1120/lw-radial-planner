@@ -1,0 +1,110 @@
+{
+  "season": 1,
+  "eventLengthDays": 28,
+  "tiers": {
+    "free": {
+      "slots": 1,
+      "odds": [
+        { "itemId": "eternal_pyramid", "quantity": 1, "rate": 0.44, "cost": 0 },
+        { "itemId": "decoration_chest", "quantity": 1, "rate": 0.44, "cost": 0 },
+        { "itemId": "ur_hero_shard", "quantity": 5, "rate": 0.44, "cost": 0 },
+        { "itemId": "hero_weapon_shard_choice_chest_ii", "quantity": 5, "rate": 0.44, "cost": 0 },
+        { "itemId": "upgrade_ore_chest_ur", "quantity": 1, "rate": 0.44, "cost": 0 },
+        { "itemId": "skill_medal_lucky_chest", "quantity": 1, "rate": 0.44, "cost": 0 },
+        { "itemId": "ur_hero_shard", "quantity": 1, "rate": 1.77, "cost": 0 },
+        { "itemId": "hero_weapon_shard_choice_chest_ii", "quantity": 1, "rate": 1.77, "cost": 0 },
+        { "itemId": "coin_chest_ur", "quantity": 1, "rate": 0.88, "cost": 0 },
+        { "itemId": "iron_chest_ur", "quantity": 1, "rate": 0.88, "cost": 0 },
+        { "itemId": "food_chest_ur", "quantity": 1, "rate": 0.88, "cost": 0 },
+        { "itemId": "ssr_hero_shard", "quantity": 1, "rate": 2.22, "cost": 0 },
+        { "itemId": "5m_speedup", "quantity": 5, "rate": 42.31, "cost": 0 },
+        { "itemId": "diamonds", "quantity": 20, "rate": 4.44, "cost": 0 },
+        { "itemId": "diamonds", "quantity": 50, "rate": 2.22, "cost": 0 },
+        { "itemId": "iron_chest_sr", "quantity": 1, "rate": 13.33, "cost": 0 },
+        { "itemId": "food_chest_sr", "quantity": 1, "rate": 13.33, "cost": 0 },
+        { "itemId": "coin_chest_sr", "quantity": 1, "rate": 13.33, "cost": 0 }
+      ]
+    },
+
+    "discounted": {
+      "slots": 2,
+      "odds": [
+        { "itemId": "decoration_chest", "quantity": 1, "rate": 0.22, "cost": 3000 },
+        { "itemId": "skill_chip_chest_ur", "quantity": 1, "rate": 0.22, "cost": 1500 },
+        { "itemId": "throne_of_blood", "quantity": 1, "rate": 0.66, "cost": 800 },
+        { "itemId": "marshall_statue", "quantity": 1, "rate": 0.66, "cost": 800 },
+        { "itemId": "ur_hero_shard", "quantity": 1, "rate": 11.17, "cost": 60 },
+        { "itemId": "hero_weapon_shard_choice_chest_ii", "quantity": 1, "rate": 11.11, "cost": 60 },
+        { "itemId": "decoration_chest", "quantity": 1, "rate": 0.22, "cost": 600 },
+        { "itemId": "skill_chip_chest_ssr", "quantity": 1, "rate": 1.11, "cost": 250 },
+        { "itemId": "iron_chest_ur", "quantity": 5, "rate": 4.44, "cost": 120 },
+        { "itemId": "food_chest_ur", "quantity": 5, "rate": 4.44, "cost": 120 },
+        { "itemId": "upgrade_ore_chest_ur", "quantity": 1, "rate": 1.11, "cost": 200 },
+        { "itemId": "skill_medal_lucky_chest", "quantity": 1, "rate": 1.11, "cost": 150 },
+        { "itemId": "valor_badge", "quantity": 100, "rate": 1.11, "cost": 300 },
+        { "itemId": "gear_blueprint_ur", "quantity": 1, "rate": 3.33, "cost": 600 },
+        { "itemId": "drone_parts", "quantity": 25, "rate": 3.33, "cost": 500 },
+        { "itemId": "decor_component", "quantity": 30, "rate": 2.22, "cost": 200 },
+        { "itemId": "decoration_chest", "quantity": 1, "rate": 0.22, "cost": 800 },
+        { "itemId": "upgrade_ore", "quantity": 400, "rate": 11.11, "cost": 50 },
+        { "itemId": "skill_medal", "quantity": 500, "rate": 11.11, "cost": 50 },
+        { "itemId": "dielectric_ceramic", "quantity": 30, "rate": 4.44, "cost": 150 },
+        { "itemId": "ssr_resource_choice_chest", "quantity": 2, "rate": 11.11, "cost": 50 },
+        { "itemId": "5m_speedup", "quantity": 12, "rate": 4.44, "cost": 10 },
+        { "itemId": "5m_speedup", "quantity": 10, "rate": 11.11, "cost": 10 }
+      ]
+    },
+
+    "regular": {
+      "slots": 3,
+      "odds": [
+        { "itemId": "gear_blueprint_ur", "quantity": 5, "rate": 0.74, "cost": 4000 },
+        { "itemId": "ur_hero_shard", "quantity": 10, "rate": 7.40, "cost": 1000 },
+        { "itemId": "hero_weapon_shard_choice_chest_ii", "quantity": 10, "rate": 4.44, "cost": 1000 },
+        { "itemId": "decoration_chest", "quantity": 1, "rate": 0.74, "cost": 4000 },
+        { "itemId": "skill_chip_chest_ur", "quantity": 1, "rate": 1.48, "cost": 3000 },
+        { "itemId": "skill_chip_chest_ssr", "quantity": 1, "rate": 2.96, "cost": 500 },
+        { "itemId": "valor_badge", "quantity": 50, "rate": 7.40, "cost": 500 },
+        { "itemId": "decoration_chest", "quantity": 1, "rate": 1.48, "cost": 1000 },
+        { "itemId": "drone_parts", "quantity": 15, "rate": 14.87, "cost": 500 },
+        { "itemId": "decor_component", "quantity": 50, "rate": 7.40, "cost": 500 },
+        { "itemId": "ssr_resource_choice_chest", "quantity": 6, "rate": 12.59, "cost": 500 },
+        { "itemId": "1h_speedup", "quantity": 30, "rate": 7.40, "cost": 800 },
+        { "itemId": "upgrade_ore", "quantity": 2000, "rate": 12.59, "cost": 600 },
+        { "itemId": "skill_medal", "quantity": 2500, "rate": 12.59, "cost": 500 },
+        { "itemId": "dielectric_ceramic", "quantity": 100, "rate": 5.92, "cost": 700 }
+      ]
+    }
+  },
+
+  "items": {
+    "eternal_pyramid": { "id": "eternal_pyramid", "name": "Eternal Pyramid" },
+    "throne_of_blood": { "id": "throne_of_blood", "name": "Throne of Blood" },
+    "marshall_statue": { "id": "marshall_statue", "name": "Marshall Statue" },
+    "decoration_chest": { "id": "decoration_chest", "name": "Decoration Chest" },
+    "skill_chip_choice_chest_ur": { "id": "skill_chip_choice_chest_ur", "name": "Skill Chip Choice Chest (UR)" },
+    "skill_chip_chest_ur": { "id": "skill_chip_chest_ur", "name": "Skill Chip Chest (UR)" },
+    "skill_chip_chest_ssr": { "id": "skill_chip_chest_ssr", "name": "Skill Chip Chest (SSR)" },
+    "ur_hero_shard": { "id": "ur_hero_shard", "name": "UR Hero Universal Shard" },
+    "ssr_hero_shard": { "id": "ssr_hero_shard", "name": "SSR Hero Universal Shard" },
+    "hero_weapon_shard_choice_chest_ii": { "id": "hero_weapon_shard_choice_chest_ii", "name": "Hero Exclusive Weapon Shard Choice Chest II" },
+    "drone_parts": { "id": "drone_parts", "name": "Drone Parts" },
+    "decor_component": { "id": "decor_component", "name": "Decor Component" },
+    "upgrade_ore": { "id": "upgrade_ore", "name": "Upgrade Ore" },
+    "upgrade_ore_chest_ur": { "id": "upgrade_ore_chest_ur", "name": "Upgrade Ore Chest (UR)" },
+    "skill_medal": { "id": "skill_medal", "name": "Skill Medal" },
+    "skill_medal_lucky_chest": { "id": "skill_medal_lucky_chest", "name": "Skill Medal Lucky Chest" },
+    "valor_badge": { "id": "valor_badge", "name": "Valor Badge" },
+    "gear_blueprint_ur": { "id": "gear_blueprint_ur", "name": "Gear Blueprint (UR)" },
+    "coin_chest_sr": { "id": "coin_chest_sr", "name": "Coin Chest (SR)" },
+    "coin_chest_ur": { "id": "coin_chest_ur", "name": "Coin Chest (UR)" },
+    "iron_chest_sr": { "id": "iron_chest_sr", "name": "Iron Chest (SR)" },
+    "iron_chest_ur": { "id": "iron_chest_ur", "name": "Iron Chest (UR)" },
+    "food_chest_sr": { "id": "food_chest_sr", "name": "Food Chest (SR)" },
+    "food_chest_ur": { "id": "food_chest_ur", "name": "Food Chest (UR)" },
+    "5m_speedup": { "id": "5m_speedup", "name": "5m Speed-up" },
+    "1h_speedup": { "id": "1h_speedup", "name": "1h Speed-up" },
+    "diamonds": { "id": "diamonds", "name": "Diamonds" },
+    "dielectric_ceramic": { "id": "dielectric_ceramic", "name": "Dielectric Ceramic" }
+  }
+}
