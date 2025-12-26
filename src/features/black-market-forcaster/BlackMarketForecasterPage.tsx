@@ -20,6 +20,12 @@ const numberFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 
 const oneDecimalFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
 const twoDecimalFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
 const percentFormatter = new Intl.NumberFormat("en-US", { style: "percent", maximumFractionDigits: 1 });
+const currencyFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  maximumFractionDigits: 2,
+  minimumFractionDigits: 0,
+});
 
 const inputStyle =
   "w-full rounded-xl border border-slate-700 bg-neutral-900/70 px-4 py-2 text-base text-slate-100 shadow-inner focus:border-sky-500 focus:outline-none";
@@ -32,6 +38,11 @@ function formatNumber(value: number): string {
 function formatDecimal(value: number): string {
   if (!Number.isFinite(value)) return "0";
   return twoDecimalFormatter.format(value);
+}
+
+function formatCurrency(value: number): string {
+  if (!Number.isFinite(value)) return "$0";
+  return currencyFormatter.format(Math.round(value * 100) / 100);
 }
 
 function formatPercent(value: number): string {
@@ -183,7 +194,7 @@ export function BlackMarketForecasterPage() {
   const [selectedItem, setSelectedItem] = useState<ForecasterItem>(itemCatalog[0]);
   const [eventDays, setEventDays] = useState<number>(forecasterData.eventLengthDays ?? 28);
   const [refreshesPerDay, setRefreshesPerDay] = useState<number>(8);
-  const [startingCurrency, setStartingCurrency] = useState<number>(0);
+  const [startingCurrency, setStartingCurrency] = useState<number>(1500);
   const [dailyIncome, setDailyIncome] = useState<number>(300);
   const [analysisMode, setAnalysisMode] = useState<AnalysisMode>("buy-all");
   const [targetQuantity, setTargetQuantity] = useState<number>(100);
@@ -240,8 +251,8 @@ export function BlackMarketForecasterPage() {
   );
 
   const affordabilityNote = availableCash >= results.expectedCost
-    ? "Covers expected spend if you buy every appearance."
-    : "Expected spend exceeds available currency."
+    ? "Covers expected Black Market Cash if you buy every appearance."
+    : "Expected spend exceeds available Black Market Cash."
 
   return (
     <div className="space-y-8 text-left">
@@ -257,7 +268,7 @@ export function BlackMarketForecasterPage() {
       <section className="rounded-2xl border border-slate-800 bg-neutral-900/70 p-6 shadow-lg">
         <div className="grid gap-4 md:grid-cols-2">
           <InputField label="Item" helper="Season 1 catalog (tap to select)">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 max-h-72 overflow-y-auto pr-1">
               {itemCatalog.map((item) => (
                 <button
                   key={item.id}
@@ -338,7 +349,7 @@ export function BlackMarketForecasterPage() {
             />
           </InputField>
 
-          <InputField label="Starting currency" helper="Coins on hand">
+          <InputField label="Starting currency" helper="Black Market Cash on hand">
             <input
               className={inputStyle}
               type="number"
@@ -348,7 +359,7 @@ export function BlackMarketForecasterPage() {
             />
           </InputField>
 
-          <InputField label="Daily income" helper="Coins gained per day">
+          <InputField label="Daily income" helper="Black Market Cash per day">
             <input
               className={inputStyle}
               type="number"
@@ -357,7 +368,7 @@ export function BlackMarketForecasterPage() {
               onChange={(event) => setDailyIncome(Math.max(0, Number(event.target.value) || 0))}
             />
             <p className="text-sm text-slate-400">
-              Available currency over the event: {formatNumber(availableCash)}.
+              Available Black Market Cash over the event: {formatCurrency(availableCash)}.
             </p>
           </InputField>
         </div>
@@ -372,12 +383,12 @@ export function BlackMarketForecasterPage() {
           />
           <StatCard
             label="Expected cost"
-            value={`${formatNumber(results.expectedCost)} coins`}
+            value={formatCurrency(results.expectedCost)}
             helper={affordabilityNote}
           />
           <StatCard
             label="Cost per unit"
-            value={results.mean > 0 ? formatDecimal(costPerUnit) : "—"}
+            value={results.mean > 0 ? formatCurrency(costPerUnit) : "—"}
             helper={analysisMode === "target" ? `Target: ${formatNumber(targetQuantity)}` : "Pure EV"}
           />
         </div>
@@ -396,7 +407,7 @@ export function BlackMarketForecasterPage() {
               </thead>
               <tbody className="divide-y divide-slate-800 text-slate-100">
                 {[{
-                  metric: "Total slot rolls",
+                  metric: "Total items shown",
                   value: formatNumber(results.totalSlotRolls),
                 }, {
                   metric: "Expected appearances",
@@ -406,10 +417,10 @@ export function BlackMarketForecasterPage() {
                   value: formatDecimal(results.mean),
                 }, {
                   metric: "Expected cost",
-                  value: `${formatNumber(results.expectedCost)} coins`,
+                  value: formatCurrency(results.expectedCost),
                 }, {
                   metric: "Cost per unit",
-                  value: results.mean > 0 ? `${formatDecimal(costPerUnit)} coins` : "—",
+                  value: results.mean > 0 ? formatCurrency(costPerUnit) : "—",
                 }].map((row) => (
                   <tr key={row.metric}>
                     <td className="px-5 py-3 text-sm font-semibold text-slate-200">{row.metric}</td>
@@ -433,7 +444,7 @@ export function BlackMarketForecasterPage() {
                     </tr>
                     <tr>
                       <td className="px-5 py-3 text-sm font-semibold text-slate-200">Expected cost to reach target</td>
-                      <td className="px-5 py-3 text-sm text-slate-100">{formatNumber(expectedCostToTarget)} coins</td>
+                      <td className="px-5 py-3 text-sm text-slate-100">{formatCurrency(expectedCostToTarget)}</td>
                     </tr>
                     {percentileCosts.map((entry) => (
                       <tr key={entry.percentile}>
@@ -441,7 +452,7 @@ export function BlackMarketForecasterPage() {
                           Cost for {entry.percentile}th percentile
                         </td>
                         <td className="px-5 py-3 text-sm text-slate-100">
-                          {formatNumber(entry.cost)} coins (quantity ≈ {formatNumber(entry.quantity)})
+                          {formatCurrency(entry.cost)} (quantity ≈ {formatNumber(entry.quantity)})
                         </td>
                       </tr>
                     ))}
