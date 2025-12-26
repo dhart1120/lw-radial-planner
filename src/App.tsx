@@ -22,9 +22,12 @@ function App() {
         {!isHome && (
           <header className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-800 bg-neutral-900/70 px-5 py-4 shadow-lg">
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-[0.35em] text-slate-400">
+              <NavLink
+                to="/"
+                className="text-xs uppercase tracking-[0.35em] text-slate-400 hover:text-sky-200"
+              >
                 Last War Tools
-              </p>
+              </NavLink>
             </div>
             <nav className="flex flex-wrap gap-2">
               <NavLink to="/radial-planner" className={navLinkClass}>
