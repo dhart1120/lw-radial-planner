@@ -38,11 +38,14 @@ function App() {
           </nav>
         </header>
 
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/radial-planner" element={<RadialPlannerPage />} />
-          <Route path="/bm-forecaster" element={<BlackMarketForecasterPage />} />
-        </Routes>
+        <main className="pb-10">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/radial-planner" element={<RadialPlannerPage />} />
+            <Route path="/bm-forecaster" element={<BlackMarketForecasterPage />} />
+            <Route path="*" element={<HomePage />} />
+          </Routes>
+        </main>
       </div>
     </div>
   );

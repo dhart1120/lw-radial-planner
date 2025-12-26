@@ -24,9 +24,19 @@ type RouterContextValue = {
 const RouterContext = createContext<RouterContextValue | null>(null);
 
 const normalizePath = (path: string) => {
+  if (!path) return "/";
   if (path === "/") return "/";
   const trimmed = path.replace(/\/+$/, "");
   return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+};
+
+const matchPath = (routePath: string, pathname: string) => {
+  if (routePath === "*") return true;
+  if (routePath.endsWith("/*")) {
+    const base = routePath.slice(0, -2);
+    return pathname === base || pathname.startsWith(`${base}/`);
+  }
+  return routePath === pathname;
 };
 
 export function BrowserRouter({ children }: PropsWithChildren) {
@@ -93,7 +103,7 @@ export function Routes({ children }: { children: ReactNode }) {
   const visitChild = (child: ReactNode) => {
     if (!match && isRouteElement(child)) {
       const childPath = normalizePath(child.props.path);
-      if (childPath === normalizedPathname) {
+      if (matchPath(childPath, normalizedPathname)) {
         match = child.props.element;
       }
     }
@@ -141,7 +151,8 @@ export function NavLink({ className, ...rest }: NavLinkProps) {
   const { pathname } = useLocation();
   const normalized = normalizePath(pathname);
   const target = normalizePath(rest.to);
-  const isActive = normalized === target;
+  const isActive =
+    normalized === target || normalized.startsWith(`${target}/`);
 
   const resolvedClassName =
     typeof className === "function" ? className({ isActive }) : className;
