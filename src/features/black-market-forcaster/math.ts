@@ -215,7 +215,9 @@ export type ForecasterResults = {
   cheapVariance: number;
   cheapCost: number;
   highCostPurchase: { cost: number; quantity: number } | null;
-  buckets: { label: string; probability: number }[];
+  bucketsAll: { label: string; probability: number }[];
+  bucketsCheap: { label: string; probability: number }[];
+  bucketsFree: { label: string; probability: number }[];
   chartAll: Array<{ quantity: number; probability: number }>;
   chartCheap: Array<{ quantity: number; probability: number }>;
   chartFree: Array<{ quantity: number; probability: number }>;
@@ -237,7 +239,9 @@ export function runForecaster(inputs: ForecasterInputs): ForecasterResults {
   const sigmaCheap = Math.sqrt(cheapMoments.variance);
   const sigmaFree = Math.sqrt(freeMoments.variance);
 
-  const buckets = buildProbabilityBuckets(primaryMoments.mean, sigmaAll, inputs.targetQuantity);
+  const bucketsAll = buildProbabilityBuckets(primaryMoments.mean, sigmaAll, inputs.targetQuantity);
+  const bucketsCheap = buildProbabilityBuckets(cheapMoments.mean, sigmaCheap, inputs.targetQuantity);
+  const bucketsFree = buildProbabilityBuckets(freeMoments.mean, sigmaFree, inputs.targetQuantity);
   const chartAll = buildChartPoints(primaryMoments.mean, sigmaAll, inputs.targetQuantity);
   const chartCheap = buildChartPoints(cheapMoments.mean, sigmaCheap, inputs.targetQuantity);
   const chartFree = buildChartPoints(freeMoments.mean, sigmaFree, inputs.targetQuantity);
@@ -254,7 +258,9 @@ export function runForecaster(inputs: ForecasterInputs): ForecasterResults {
     cheapVariance: cheapMoments.variance,
     cheapCost: cheapMoments.expectedCost,
     highCostPurchase: selectHighCostPurchase(occurrences),
-    buckets,
+    bucketsAll,
+    bucketsCheap,
+    bucketsFree,
     chartAll,
     chartCheap,
     chartFree,

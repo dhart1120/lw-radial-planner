@@ -13,6 +13,7 @@ import {
 import { isItemInCatalog, listItems, type ForecasterItem } from "./itemCatalog";
 
 type AnalysisMode = "buy-all" | "target";
+type DistributionScope = "all" | "cheap" | "free";
 
 const itemCatalog = listItems();
 
@@ -336,6 +337,7 @@ export function BlackMarketForecasterPage() {
   const [dailyIncome, setDailyIncome] = useState<number>(300);
   const [analysisMode, setAnalysisMode] = useState<AnalysisMode>("buy-all");
   const [targetQuantity, setTargetQuantity] = useState<number>(100);
+  const [distributionScope, setDistributionScope] = useState<DistributionScope>("all");
 
   const setsPerEvent = eventDays * refreshesPerDay;
   const availableCash = startingCurrency + dailyIncome * eventDays;
@@ -387,6 +389,12 @@ export function BlackMarketForecasterPage() {
     () => probabilityToHitTarget(targetQuantity, results.mean, results.variance),
     [results.mean, results.variance, targetQuantity],
   );
+
+  const distributionBuckets = useMemo(() => {
+    if (distributionScope === "free") return results.bucketsFree;
+    if (distributionScope === "cheap") return results.bucketsCheap;
+    return results.bucketsAll;
+  }, [distributionScope, results.bucketsAll, results.bucketsCheap, results.bucketsFree]);
 
   const affordabilityNote = availableCash >= results.expectedCost
     ? "Covers expected Black Market Cash if you buy every appearance."
@@ -605,8 +613,24 @@ export function BlackMarketForecasterPage() {
       <section className="grid gap-6 lg:grid-cols-2">
         <div className="rounded-2xl border border-slate-800 bg-neutral-900/70 shadow-lg">
           <div className="border-b border-slate-800 px-5 py-4">
-            <p className="text-sm uppercase tracking-[0.25em] text-slate-400">Probability distribution</p>
-            <p className="text-sm text-slate-400">Normal approximation of the combined binomials.</p>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-sm uppercase tracking-[0.25em] text-slate-400">Probability distribution</p>
+                <p className="text-sm text-slate-400">Normal approximation of the combined binomials.</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">Scope</label>
+                <select
+                  className="rounded-lg border border-slate-700 bg-neutral-900/70 px-3 py-2 text-sm text-slate-100 focus:border-sky-400 focus:outline-none"
+                  value={distributionScope}
+                  onChange={(event) => setDistributionScope(event.target.value as DistributionScope)}
+                >
+                  <option value="free">Free only</option>
+                  <option value="cheap">Free + discounted</option>
+                  <option value="all">All items</option>
+                </select>
+              </div>
+            </div>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[420px] border-collapse">
@@ -617,7 +641,7 @@ export function BlackMarketForecasterPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800 text-slate-100">
-                {results.buckets.map((bucket) => (
+                {distributionBuckets.map((bucket) => (
                   <tr key={bucket.label}>
                     <td className="px-5 py-3 text-sm font-semibold text-slate-200">{bucket.label}</td>
                     <td className="px-5 py-3 text-sm text-slate-100">{formatPercent(bucket.probability)}</td>
