@@ -211,6 +211,12 @@ export type ForecasterResults = {
   expectedAppearances: number;
   freeMean: number;
   freeVariance: number;
+  discountedMean: number;
+  discountedVariance: number;
+  discountedCost: number;
+  regularMean: number;
+  regularVariance: number;
+  regularCost: number;
   cheapMean: number;
   cheapVariance: number;
   cheapCost: number;
@@ -234,6 +240,8 @@ export function runForecaster(inputs: ForecasterInputs): ForecasterResults {
   const primaryMoments = calculateMoments(occurrences);
   const cheapMoments = calculateMoments(occurrences, (occ) => occ.tier !== "regular");
   const freeMoments = calculateMoments(occurrences, (occ) => occ.tier === "free");
+  const discountedMoments = calculateMoments(occurrences, (occ) => occ.tier === "discounted");
+  const regularMoments = calculateMoments(occurrences, (occ) => occ.tier === "regular");
 
   const sigmaAll = Math.sqrt(primaryMoments.variance);
   const sigmaCheap = Math.sqrt(cheapMoments.variance);
@@ -254,6 +262,12 @@ export function runForecaster(inputs: ForecasterInputs): ForecasterResults {
     expectedAppearances: primaryMoments.expectedAppearances,
     freeMean: freeMoments.mean,
     freeVariance: freeMoments.variance,
+    discountedMean: discountedMoments.mean,
+    discountedVariance: discountedMoments.variance,
+    discountedCost: discountedMoments.expectedCost,
+    regularMean: regularMoments.mean,
+    regularVariance: regularMoments.variance,
+    regularCost: regularMoments.expectedCost,
     cheapMean: cheapMoments.mean,
     cheapVariance: cheapMoments.variance,
     cheapCost: cheapMoments.expectedCost,
@@ -318,6 +332,10 @@ export function probabilityWithoutHighCost(targetQuantity: number, mean: number,
 export function probabilityToHitTarget(targetQuantity: number, mean: number, variance: number): number {
   const sigma = Math.sqrt(variance);
   return probabilityAtLeast(targetQuantity, mean, sigma);
+}
+
+export function buildDistributionBuckets(mean: number, variance: number, targetQuantity?: number) {
+  return buildProbabilityBuckets(mean, Math.sqrt(variance), targetQuantity);
 }
 
 export type ForecasterData = typeof forecasterData;

@@ -2,6 +2,7 @@ import type React from "react";
 import { useMemo, useState } from "react";
 import {
   buildExpectedCostToTarget,
+  buildDistributionBuckets,
   buildPercentileQuantities,
   buildTargetCosts,
   forecasterData,
@@ -390,11 +391,43 @@ export function BlackMarketForecasterPage() {
     [results.mean, results.variance, targetQuantity],
   );
 
+  const paidCostAll = results.discountedCost + results.regularCost;
+  const paidCostCheap = results.discountedCost;
+  const factorAll = paidCostAll > 0 ? Math.min(1, availableCash / paidCostAll) : 1;
+  const factorCheap = paidCostCheap > 0 ? Math.min(1, availableCash / paidCostCheap) : 1;
+  const isCappedAll = factorAll < 1;
+  const isCappedCheap = factorCheap < 1;
+
+  const cappedMeanAll = results.freeMean + factorAll * (results.discountedMean + results.regularMean);
+  const cappedVarianceAll = results.freeVariance + factorAll * (results.discountedVariance + results.regularVariance);
+  const cappedCostAll = factorAll * paidCostAll;
+
+  const cappedMeanCheap = results.freeMean + factorCheap * results.discountedMean;
+  const cappedVarianceCheap = results.freeVariance + factorCheap * results.discountedVariance;
+  const cappedCostCheap = factorCheap * paidCostCheap;
+
+  const cappedCostPerUnit = cappedMeanAll > 0 ? cappedCostAll / cappedMeanAll : 0;
+
   const distributionBuckets = useMemo(() => {
-    if (distributionScope === "free") return results.bucketsFree;
-    if (distributionScope === "cheap") return results.bucketsCheap;
-    return results.bucketsAll;
-  }, [distributionScope, results.bucketsAll, results.bucketsCheap, results.bucketsFree]);
+    if (distributionScope === "free") {
+      return buildDistributionBuckets(results.freeMean, results.freeVariance, targetQuantity);
+    }
+    if (distributionScope === "cheap") {
+      return buildDistributionBuckets(cappedMeanCheap, cappedVarianceCheap, targetQuantity);
+    }
+    return buildDistributionBuckets(cappedMeanAll, cappedVarianceAll, targetQuantity);
+  }, [
+    distributionScope,
+    results.freeMean,
+    results.freeVariance,
+    cappedMeanCheap,
+    cappedVarianceCheap,
+    cappedMeanAll,
+    cappedVarianceAll,
+    targetQuantity,
+  ]);
+
+  const distributionCappedWarning = (distributionScope === "cheap" && isCappedCheap) || (distributionScope === "all" && isCappedAll);
 
   const affordabilityNote = availableCash >= results.expectedCost
     ? "Covers expected Black Market Cash if you buy every appearance."
@@ -524,17 +557,21 @@ export function BlackMarketForecasterPage() {
         <div className="grid gap-4 md:grid-cols-3">
           <StatCard
             label="Expected quantity"
-            value={formatDecimal(results.mean)}
-            helper={`${formatDecimal(results.expectedAppearances)} expected appearances`}
+            value={formatDecimal(cappedMeanAll)}
+            helper={
+              isCappedAll
+                ? "Capped by available Black Market Cash."
+                : `${formatDecimal(results.expectedAppearances)} expected appearances`
+            }
           />
           <StatCard
             label="Expected cost"
-            value={formatCurrency(results.expectedCost)}
-            helper={affordabilityNote}
+            value={formatCurrency(cappedCostAll)}
+            helper={isCappedAll ? "Capped by available Black Market Cash." : affordabilityNote}
           />
           <StatCard
             label="Cost per unit"
-            value={results.mean > 0 ? formatCurrency(costPerUnit) : "—"}
+            value={cappedMeanAll > 0 ? formatCurrency(cappedCostPerUnit) : "—"}
             helper={analysisMode === "target" ? `Target: ${formatNumber(targetQuantity)}` : "Pure EV"}
           />
         </div>
@@ -649,6 +686,11 @@ export function BlackMarketForecasterPage() {
                 ))}
               </tbody>
             </table>
+            {distributionCappedWarning ? (
+              <p className="px-5 pb-4 pt-2 text-xs text-amber-300">
+                Probabilities reflect caps based on available Black Market Cash.
+              </p>
+            ) : null}
           </div>
         </div>
 
