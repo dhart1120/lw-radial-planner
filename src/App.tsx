@@ -1,119 +1,51 @@
-import { useState } from 'react'
-import ClockDisplay from "./features/build-timer/ClockDisplay";
-import { getUTCTime } from './utils/timeUtils' 
-import './App.css'
-import Header from "./components/Header"
-import TimerDial from './features/build-timer/TimerDial';
-import AddBuildTask from './features/build-timer/AddBuildTask';
-import { useCurrentTime } from './hooks/useCurrentTime';
-import { type Task, type Config, defaultConfig } from './features/build-timer/types';
-import { TaskList } from './features/build-timer/TaskList';
-import { v4 as uuidV4} from 'uuid';
-import { useLocalStorage } from './hooks/useLocalStorage';
+import { NavLink, Route, Routes } from "react-router-dom";
+import "./App.css";
+import { BlackMarketForecasterPage } from "./features/black-market-forcaster/BlackMarketForecasterPage";
+import { RadialPlannerPage } from "./features/build-timer/RadialPlannerPage";
+import { HomePage } from "./pages/HomePage";
+
+const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+  [
+    "rounded-xl border border-slate-700 px-4 py-2 text-sm font-semibold transition-colors",
+    isActive
+      ? "bg-sky-600 text-white shadow-lg shadow-sky-900/40"
+      : "bg-neutral-900/60 text-slate-200 hover:border-sky-500/70 hover:text-sky-100",
+  ].join(" ");
 
 function App() {
-  const [tasks, setTasks] = useLocalStorage<Task[]>("task-list", []);
-  const [config, setConfig] = useLocalStorage<Config>("config", defaultConfig);
-  
-  const localDate = useCurrentTime("minute");
-  const [buildTime, setBuildTime] = useState<number>(0); // 10% of max time
-  const [dialVersion, setDialVersion] = useState<number>(0);
-  
-
-  const utcDate = getUTCTime();
-  // const localTZOffset = getUserTimezoneOffset();
-
-  // const utcTime = formatTimeAndDate(utcDate, 0);          
-  // const userTime = formatTimeAndDate(localDate, -localTZOffset);
-
-  const handleUpdateConfig = function(newConfig: Config) {
-    console.log("Updating config", config)
-    setConfig(newConfig);
-    setBuildTime(0);
-    setDialVersion(v => v + 1); // redraw hack
-  };
-
-  // Helper: sort started first, then by startedAt, then addedAt
-  const sortTasks = (tasks: Task[]): Task[] =>
-    [...tasks].sort((a, b) => {
-      const aStarted = !!a.startAt;
-      const bStarted = !!b.startAt;
-
-      // started tasks first
-      if (aStarted !== bStarted) return aStarted ? -1 : 1;
-
-      // both started: sort by startAt ascending
-      if (a.startAt && b.startAt) {
-        const diff = a.startAt.getTime() - b.startAt.getTime();
-        if (diff !== 0) return diff;
-      }
-
-      // either both not started, or same startAt: sort by addedAt ascending
-      return a.addedAt.getTime() - b.addedAt.getTime();
-    });
-
-  // Shared helper to add a task
-  const addTask = (task: Task, startImmediately: boolean) => {
-    const now = new Date();
-
-    const newTask: Task = {
-      ...task,
-      id: uuidV4(),
-      ...(startImmediately ? { startAt: now } : {}), // omit if not started
-    };
-
-    setTasks(list => sortTasks([...list, newTask]));
-    setBuildTime(0);
-    setDialVersion(v => v + 1); // redraw hack
-  };
-
-  const handleAddTask = (task: Task) => {
-    console.log("Starting task now", task);
-    addTask(task, true);
-  };
-
-  const handleQueueTask = (task: Task) => {
-    console.log("Adding task to queue", task);
-    addTask(task, false);
-  };
-
-  const handleOnStartTask = (id?: string) => {
-    if (!id) return;
-
-    setTasks(tasks => {
-      const updated = tasks.map(t =>
-        t.id === id ? { ...t, startAt: new Date() } : t
-      );
-      return sortTasks(updated);
-    });
-  };
-
-
-  const handleOnDeleteTask = function(id?: string) {
-    if(!id) return;
-    setTasks(tasks => tasks.filter(t => t.id !== id));
-  }
-
   return (
-    <>
-    <Header config={config} onUpdateConfig={handleUpdateConfig} />
-    <div className="w-full flex flex-nowrap gap-5 mb-5">
-      <div className="flex-1">
-        <ClockDisplay date={utcDate} offset={config.serverTimeOffset} label={<h2>Server Time</h2>} />
+    <div className="min-h-screen bg-background text-foreground text-left">
+      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-8 text-left">
+        <header className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-800 bg-neutral-900/70 px-5 py-4 shadow-lg">
+          <div className="space-y-1">
+            <p className="text-xs uppercase tracking-[0.35em] text-slate-400">
+              LWS Tools
+            </p>
+            <h1 className="text-xl font-bold text-slate-100">
+              Planner &amp; Forecaster
+            </h1>
+          </div>
+          <nav className="flex flex-wrap gap-2">
+            <NavLink to="/" className={navLinkClass}>
+              Home
+            </NavLink>
+            <NavLink to="/radial-planner" className={navLinkClass}>
+              Radial Planner
+            </NavLink>
+            <NavLink to="/bm-forecaster" className={navLinkClass}>
+              BM Forecaster
+            </NavLink>
+          </nav>
+        </header>
+
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/radial-planner" element={<RadialPlannerPage />} />
+          <Route path="/bm-forecaster" element={<BlackMarketForecasterPage />} />
+        </Routes>
       </div>
-      <div className="flex-1">
-        <ClockDisplay date={localDate} label={<h2>Local Time</h2>} />
-      </div>
     </div>
-    <div className="mt-5 mb-5">
-      <TimerDial key={dialVersion} maxDays={config.maxDaysOnDial} buildTime={buildTime} onChange={setBuildTime}/>
-    </div>
-    <AddBuildTask buildTime={buildTime} currentTime={localDate} onStartNow={handleAddTask} onAddToPlan={handleQueueTask} />
-    <div className="mt-5 mb-5">
-      <TaskList tasks={tasks} onStartTask={handleOnStartTask} onDeleteTask={handleOnDeleteTask} />
-    </div>
-    </>
-  )
+  );
 }
 
-export default App
+export default App;
