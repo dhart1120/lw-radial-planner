@@ -209,12 +209,16 @@ export type ForecasterResults = {
   variance: number;
   expectedCost: number;
   expectedAppearances: number;
+  freeMean: number;
+  freeVariance: number;
   cheapMean: number;
   cheapVariance: number;
   cheapCost: number;
   highCostPurchase: { cost: number; quantity: number } | null;
   buckets: { label: string; probability: number }[];
-  chart: Array<{ quantity: number; probability: number }>;
+  chartAll: Array<{ quantity: number; probability: number }>;
+  chartCheap: Array<{ quantity: number; probability: number }>;
+  chartFree: Array<{ quantity: number; probability: number }>;
 };
 
 export function runForecaster(inputs: ForecasterInputs): ForecasterResults {
@@ -227,10 +231,16 @@ export function runForecaster(inputs: ForecasterInputs): ForecasterResults {
 
   const primaryMoments = calculateMoments(occurrences);
   const cheapMoments = calculateMoments(occurrences, (occ) => occ.tier !== "regular");
+  const freeMoments = calculateMoments(occurrences, (occ) => occ.tier === "free");
 
-  const sigma = Math.sqrt(primaryMoments.variance);
-  const buckets = buildProbabilityBuckets(primaryMoments.mean, sigma, inputs.targetQuantity);
-  const chart = buildChartPoints(primaryMoments.mean, sigma, inputs.targetQuantity);
+  const sigmaAll = Math.sqrt(primaryMoments.variance);
+  const sigmaCheap = Math.sqrt(cheapMoments.variance);
+  const sigmaFree = Math.sqrt(freeMoments.variance);
+
+  const buckets = buildProbabilityBuckets(primaryMoments.mean, sigmaAll, inputs.targetQuantity);
+  const chartAll = buildChartPoints(primaryMoments.mean, sigmaAll, inputs.targetQuantity);
+  const chartCheap = buildChartPoints(cheapMoments.mean, sigmaCheap, inputs.targetQuantity);
+  const chartFree = buildChartPoints(freeMoments.mean, sigmaFree, inputs.targetQuantity);
 
   return {
     totalSlotRolls,
@@ -238,12 +248,16 @@ export function runForecaster(inputs: ForecasterInputs): ForecasterResults {
     variance: primaryMoments.variance,
     expectedCost: primaryMoments.expectedCost,
     expectedAppearances: primaryMoments.expectedAppearances,
+    freeMean: freeMoments.mean,
+    freeVariance: freeMoments.variance,
     cheapMean: cheapMoments.mean,
     cheapVariance: cheapMoments.variance,
     cheapCost: cheapMoments.expectedCost,
     highCostPurchase: selectHighCostPurchase(occurrences),
     buckets,
-    chart,
+    chartAll,
+    chartCheap,
+    chartFree,
   };
 }
 

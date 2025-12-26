@@ -84,26 +84,85 @@ function InputField({ label, helper, children }: InputFieldProps) {
 }
 
 type ProbabilityChartProps = {
-  data: Array<{ quantity: number; probability: number }>;
+  all: Array<{ quantity: number; probability: number }>;
+  cheap: Array<{ quantity: number; probability: number }>;
+  free: Array<{ quantity: number; probability: number }>;
 };
 
-function ProbabilityChart({ data }: ProbabilityChartProps) {
+function ProbabilityChart({ all, cheap, free }: ProbabilityChartProps) {
+  const series = [
+    { label: "All items", color: "#0ea5e9", data: all },
+    { label: "Free + discounted", color: "#22d3ee", data: cheap },
+    { label: "Free only", color: "#a855f7", data: free },
+  ];
+
   const width = 640;
   const height = 320;
   const padding = 50;
-  const maxQuantity = data[data.length - 1]?.quantity ?? 0;
+  const maxQuantity = Math.max(
+    all[all.length - 1]?.quantity ?? 0,
+    cheap[cheap.length - 1]?.quantity ?? 0,
+    free[free.length - 1]?.quantity ?? 0,
+  );
   const safeMaxQuantity = maxQuantity === 0 ? 1 : maxQuantity;
 
-  const path = data
-    .map((point) => {
-      const x = padding + (point.quantity / safeMaxQuantity) * (width - padding * 2);
-      const y = height - padding - point.probability * (height - padding * 2);
-      return `${x},${y}`;
-    })
-    .join(" L ");
+  const [hoverQuantity, setHoverQuantity] = useState<number | null>(null);
+
+  const pathForSeries = (data: Array<{ quantity: number; probability: number }>) =>
+    data
+      .map((point) => {
+        const x = padding + (point.quantity / safeMaxQuantity) * (width - padding * 2);
+        const y = height - padding - point.probability * (height - padding * 2);
+        return `${x},${y}`;
+      })
+      .join(" L ");
+
+  const paths = series.map((entry) => ({
+    label: entry.label,
+    color: entry.color,
+    path: pathForSeries(entry.data),
+  }));
 
   const xTicks = 4;
   const yTicks = 4;
+
+  const findNearestPoint = (
+    data: Array<{ quantity: number; probability: number }>,
+    quantity: number,
+  ) => {
+    let nearest = data[0];
+    let best = Number.POSITIVE_INFINITY;
+    data.forEach((point) => {
+      const diff = Math.abs(point.quantity - quantity);
+      if (diff < best) {
+        nearest = point;
+        best = diff;
+      }
+    });
+    return nearest;
+  };
+
+  const hoverInfo =
+    hoverQuantity == null
+      ? null
+      : series.map((entry) => {
+          const nearest = findNearestPoint(entry.data, hoverQuantity);
+          return {
+            label: entry.label,
+            color: entry.color,
+            point: nearest,
+          };
+        });
+
+  const handleMouseMove = (event: React.MouseEvent<SVGRectElement, MouseEvent>) => {
+    const rect = (event.currentTarget.parentNode as SVGSVGElement).getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const ratio = (x - padding) / (width - padding * 2);
+    const quantity = Math.max(0, Math.min(safeMaxQuantity, ratio * safeMaxQuantity));
+    setHoverQuantity(quantity);
+  };
+
+  const handleMouseLeave = () => setHoverQuantity(null);
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="h-72 w-full rounded-2xl border border-slate-800 bg-neutral-950/70 p-3 shadow-inner">
@@ -148,15 +207,24 @@ function ProbabilityChart({ data }: ProbabilityChartProps) {
       <line x1={padding} x2={width - padding} y1={height - padding} y2={height - padding} stroke="#94a3b8" strokeWidth={1.5} />
       <line x1={padding} x2={padding} y1={padding} y2={height - padding} stroke="#94a3b8" strokeWidth={1.5} />
 
-      {/* shaded area */}
+      {/* shaded area for all items */}
       <path
-        d={`M ${padding},${height - padding} L ${path} L ${width - padding},${height - padding} Z`}
+        d={`M ${padding},${height - padding} L ${paths[0].path} L ${width - padding},${height - padding} Z`}
         fill="url(#probabilityGradient)"
         stroke="none"
       />
 
-      {/* probability line */}
-      <path d={`M ${path}`} fill="none" stroke="#0ea5e9" strokeWidth={3} strokeLinecap="round" />
+      {/* probability lines */}
+      {paths.map((line) => (
+        <path
+          key={line.label}
+          d={`M ${line.path}`}
+          fill="none"
+          stroke={line.color}
+          strokeWidth={3}
+          strokeLinecap="round"
+        />
+      ))}
 
       {/* x-axis labels */}
       {Array.from({ length: xTicks + 1 }).map((_, index) => {
@@ -186,6 +254,76 @@ function ProbabilityChart({ data }: ProbabilityChartProps) {
       <text x={padding - 35} y={height / 2} fill="#cbd5e1" fontSize={12} textAnchor="middle" transform={`rotate(-90 ${padding - 35},${height / 2})`}>
         P(quantity ≥ X)
       </text>
+
+      {/* hover cursor */}
+      {hoverInfo && (
+        <>
+          <line
+            x1={padding + (hoverInfo[0].point.quantity / safeMaxQuantity) * (width - padding * 2)}
+            x2={padding + (hoverInfo[0].point.quantity / safeMaxQuantity) * (width - padding * 2)}
+            y1={padding}
+            y2={height - padding}
+            stroke="rgba(148, 163, 184, 0.5)"
+            strokeDasharray="4 4"
+          />
+          {hoverInfo.map((entry) => {
+            const cx = padding + (entry.point.quantity / safeMaxQuantity) * (width - padding * 2);
+            const cy = height - padding - entry.point.probability * (height - padding * 2);
+            return (
+              <g key={entry.label}>
+                <circle cx={cx} cy={cy} r={5} fill={entry.color} stroke="#0b1220" strokeWidth={2} />
+              </g>
+            );
+          })}
+          <rect
+            x={padding + 10}
+            y={padding + 10}
+            width={180}
+            height={20 + hoverInfo.length * 20}
+            rx={10}
+            ry={10}
+            fill="rgba(15, 23, 42, 0.9)"
+            stroke="rgba(226, 232, 240, 0.2)"
+          />
+          <text x={padding + 20} y={padding + 30} fill="#cbd5e1" fontSize={12} fontWeight={600}>
+            Qty ~ {formatNumber(hoverInfo[0].point.quantity)}
+          </text>
+          {hoverInfo.map((entry, index) => (
+            <text
+              key={entry.label}
+              x={padding + 20}
+              y={padding + 50 + index * 18}
+              fill={entry.color}
+              fontSize={12}
+            >
+              {entry.label}: {oneDecimalFormatter.format(entry.point.probability * 100)}%
+            </text>
+          ))}
+        </>
+      )}
+
+      {/* hover capture */}
+      <rect
+        x={padding}
+        y={padding}
+        width={width - padding * 2}
+        height={height - padding * 2}
+        fill="transparent"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+      />
+
+      {/* legend */}
+      <g transform={`translate(${width - padding - 150}, ${padding + 10})`}>
+        {series.map((entry, index) => (
+          <g key={entry.label} transform={`translate(0, ${index * 18})`}>
+            <rect x={0} y={-10} width={14} height={6} fill={entry.color} rx={3} />
+            <text x={20} y={0} fill="#cbd5e1" fontSize={12}>
+              {entry.label}
+            </text>
+          </g>
+        ))}
+      </g>
     </svg>
   );
 }
@@ -496,7 +634,7 @@ export function BlackMarketForecasterPage() {
             <p className="text-sm text-slate-400">P(quantity ≥ X) using normal CDF with continuity correction.</p>
           </div>
           <div className="p-4">
-            <ProbabilityChart data={results.chart} />
+            <ProbabilityChart all={results.chartAll} cheap={results.chartCheap} free={results.chartFree} />
           </div>
         </div>
       </section>
