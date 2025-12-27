@@ -254,9 +254,9 @@ export function runForecaster(inputs: ForecasterInputs): ForecasterResults {
   const bucketsAll = buildProbabilityBuckets(primaryMoments.mean, sigmaAll, inputs.targetQuantity);
   const bucketsCheap = buildProbabilityBuckets(cheapMoments.mean, sigmaCheap, inputs.targetQuantity);
   const bucketsFree = buildProbabilityBuckets(freeMoments.mean, sigmaFree, inputs.targetQuantity);
-  const chartAll = buildChartPoints(primaryMoments.mean, sigmaAll, inputs.targetQuantity);
-  const chartCheap = buildChartPoints(cheapMoments.mean, sigmaCheap, inputs.targetQuantity);
-  const chartFree = buildChartPoints(freeMoments.mean, sigmaFree, inputs.targetQuantity);
+  const chartAll = buildChartPoints(primaryMoments.mean, sigmaAll);
+  const chartCheap = buildChartPoints(cheapMoments.mean, sigmaCheap);
+  const chartFree = buildChartPoints(freeMoments.mean, sigmaFree);
 
   return {
     totalSlotRolls,
@@ -342,8 +342,8 @@ export function buildDistributionBuckets(mean: number, variance: number, targetQ
   return buildProbabilityBuckets(mean, Math.sqrt(variance), targetQuantity);
 }
 
-export function buildChartSeries(mean: number, variance: number, targetQuantity?: number) {
-  return buildChartPoints(mean, Math.sqrt(variance), targetQuantity);
+export function buildChartSeries(mean: number, variance: number) {
+  return buildChartPoints(mean, Math.sqrt(variance));
 }
 
 export type ForecasterData = typeof forecasterData;
