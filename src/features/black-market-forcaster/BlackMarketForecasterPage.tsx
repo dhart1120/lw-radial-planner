@@ -56,14 +56,29 @@ type StatCardProps = {
   label: string;
   value: string;
   helper?: string;
+  breakdown?: Array<{ label: string; value: string }>;
+  footer?: React.ReactNode;
 };
 
-function StatCard({ label, value, helper }: StatCardProps) {
+function StatCard({ label, value, helper, breakdown, footer }: StatCardProps) {
   return (
     <div className="rounded-2xl border border-slate-800 bg-neutral-900/80 p-5 shadow-lg">
       <p className="text-sm uppercase tracking-[0.2em] text-slate-400">{label}</p>
       <p className="mt-2 text-3xl font-bold text-slate-100">{value}</p>
       {helper ? <p className="mt-1 text-sm text-slate-400">{helper}</p> : null}
+      {breakdown && breakdown.length > 0 ? (
+        <div className="mt-3 overflow-hidden rounded-xl border border-slate-800 bg-neutral-900/70 text-sm text-slate-200">
+          <div className="divide-y divide-slate-800">
+            {breakdown.map((row) => (
+              <div key={row.label} className="flex items-center justify-between px-3 py-2">
+                <span className="font-medium">{row.label}</span>
+                <span className="text-slate-100">{row.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
+      {footer ? <div className="mt-2 text-xs text-slate-400">{footer}</div> : null}
     </div>
   );
 }
@@ -481,6 +496,44 @@ export function BlackMarketForecasterPage() {
   const optimalCostTotal = discountedQtyUsed * discountedUnitCost + regularQtyUsed * regularUnitCost;
   const optimalUnfilled = Math.max(0, remainingAfterDiscounted - regularQtyUsed);
 
+  const quantityBreakdown =
+    analysisMode === "target"
+      ? [
+          { label: "Free", value: formatDecimal(freeQtyUsed) },
+          { label: "Discounted", value: formatDecimal(discountedQtyUsed) },
+          { label: "Regular", value: formatDecimal(regularQtyUsed) },
+        ]
+      : [
+          { label: "Free", value: formatDecimal(results.freeMean) },
+          { label: "Discounted", value: formatDecimal(limitByCash ? results.discountedMean * factorCheap : results.discountedMean) },
+          { label: "Regular", value: formatDecimal(limitByCash ? results.regularMean * factorAll : results.regularMean) },
+        ];
+
+  const costBreakdown =
+    analysisMode === "target"
+      ? [
+          { label: "Free", value: formatCurrency(0) },
+          { label: "Discounted", value: formatCurrency(discountedQtyUsed * discountedUnitCost) },
+          { label: "Regular", value: formatCurrency(regularQtyUsed * regularUnitCost) },
+        ]
+      : [
+          { label: "Free", value: formatCurrency(0) },
+          {
+            label: "Discounted",
+            value: formatCurrency((limitByCash ? results.discountedCost * factorCheap : results.discountedCost)),
+          },
+          {
+            label: "Regular",
+            value: formatCurrency((limitByCash ? results.regularCost * factorAll : results.regularCost)),
+          },
+        ];
+
+  const unitCostBreakdown = [
+    { label: "Free", value: formatCurrency(0) },
+    { label: "Discounted", value: discountedUnitCost > 0 ? formatCurrency(discountedUnitCost) : "—" },
+    { label: "Regular", value: regularUnitCost > 0 ? formatCurrency(regularUnitCost) : "—" },
+  ];
+
   const affordabilityNote = availableCash >= results.expectedCost
     ? "Covers expected Black Market Cash if you buy every appearance."
     : "Expected spend exceeds available Black Market Cash."
@@ -624,34 +677,30 @@ export function BlackMarketForecasterPage() {
                 ? "Capped by available Black Market Cash."
                 : `${formatDecimal(results.expectedAppearances)} expected appearances`
             }
+            breakdown={quantityBreakdown.map((row) => ({ ...row }))}
           />
-          {analysisMode === "target" ? (
-            <div className="rounded-2xl border border-slate-800 bg-neutral-900/80 p-5 shadow-lg">
-              <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Optimal Cost</p>
-              <p className="mt-2 text-3xl font-bold text-slate-100">{formatCurrency(optimalCostTotal)}</p>
-              <div className="mt-2 space-y-1 text-sm text-slate-300">
-                <p>{formatNumber(Math.round(freeQtyUsed))} Free = {formatCurrency(0)}</p>
-                <p>{formatNumber(Math.round(discountedQtyUsed))} Discounted = {formatCurrency(discountedQtyUsed * discountedUnitCost)}</p>
-                <p>{formatNumber(Math.round(regularQtyUsed))} Regular = {formatCurrency(regularQtyUsed * regularUnitCost)}</p>
-                {optimalUnfilled > 0 ? (
-                  <p className="text-amber-300">Unfilled quantity: {formatNumber(Math.round(optimalUnfilled))}</p>
-                ) : null}
-              </div>
-              <p className="mt-2 text-xs text-slate-400">
-                {isCappedAll || isCappedCheap ? "Capped by available Black Market Cash." : "Uses expected odds; free, then discounted, then regular slots."}
-              </p>
-            </div>
-          ) : (
-            <StatCard
-              label="Expected cost"
-              value={formatCurrency(cappedCostAll)}
-              helper={isCappedAll ? "Capped by available Black Market Cash." : affordabilityNote}
-            />
-          )}
+          <StatCard
+            label={analysisMode === "target" ? "Optimal Cost" : "Expected cost"}
+            value={analysisMode === "target" ? formatCurrency(optimalCostTotal) : formatCurrency(cappedCostAll)}
+            helper={
+              isCappedAll || isCappedCheap
+                ? "Capped by available Black Market Cash."
+                : analysisMode === "target"
+                  ? "Uses expected odds; free, then discounted, then regular slots."
+                  : affordabilityNote
+            }
+            breakdown={costBreakdown}
+            footer={
+              analysisMode === "target" && optimalUnfilled > 0
+                ? <span className="text-amber-300">Unfilled quantity: {formatNumber(Math.round(optimalUnfilled))}</span>
+                : null
+            }
+          />
           <StatCard
             label="Cost per unit"
             value={cappedMeanAll > 0 ? formatCurrency(cappedCostPerUnit) : "—"}
             helper={analysisMode === "target" ? `Target: ${formatNumber(targetQuantity)}` : "Pure EV"}
+            breakdown={unitCostBreakdown}
           />
         </div>
 
