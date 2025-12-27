@@ -168,12 +168,13 @@ function ProbabilityChart({ all, cheap, free }: ProbabilityChartProps) {
   const handleMouseLeave = () => setHoverQuantity(null);
 
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="h-72 w-full rounded-2xl border border-slate-800 bg-neutral-950/70 p-3 shadow-inner">
-      <defs>
-        <linearGradient id="probabilityGradient" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor="#0ea5e9" stopOpacity={0.35} />
-          <stop offset="100%" stopColor="#0ea5e9" stopOpacity={0.05} />
-        </linearGradient>
+    <div className="space-y-3">
+      <svg viewBox={`0 0 ${width} ${height}`} className="h-72 w-full rounded-2xl border border-slate-800 bg-neutral-950/70 p-3 shadow-inner">
+        <defs>
+          <linearGradient id="probabilityGradient" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="#0ea5e9" stopOpacity={0.35} />
+            <stop offset="100%" stopColor="#0ea5e9" stopOpacity={0.05} />
+          </linearGradient>
       </defs>
 
       {/* grid lines */}
@@ -254,7 +255,7 @@ function ProbabilityChart({ all, cheap, free }: ProbabilityChartProps) {
       <text x={width / 2} y={height - 10} fill="#cbd5e1" fontSize={12} textAnchor="middle">
         Quantity obtained
       </text>
-      <text x={padding - 35} y={height / 2} fill="#cbd5e1" fontSize={12} textAnchor="middle" transform={`rotate(-90 ${padding - 35},${height / 2})`}>
+      <text x={padding - 45} y={height / 2} fill="#cbd5e1" fontSize={12} textAnchor="middle" transform={`rotate(-90 ${padding - 45},${height / 2})`}>
         P(quantity ≥ X)
       </text>
 
@@ -316,18 +317,17 @@ function ProbabilityChart({ all, cheap, free }: ProbabilityChartProps) {
         onMouseLeave={handleMouseLeave}
       />
 
-      {/* legend */}
-      <g transform={`translate(${width - padding - 150}, ${padding + 10})`}>
-        {series.map((entry, index) => (
-          <g key={entry.label} transform={`translate(0, ${index * 18})`}>
-            <rect x={0} y={-10} width={14} height={6} fill={entry.color} rx={3} />
-            <text x={20} y={0} fill="#cbd5e1" fontSize={12}>
-              {entry.label}
-            </text>
-          </g>
+      </svg>
+
+      <div className="flex flex-wrap items-center justify-end gap-3 px-3 text-sm text-slate-200">
+        {series.map((entry) => (
+          <div key={entry.label} className="flex items-center gap-2">
+            <span className="inline-block h-3 w-3 rounded-full" style={{ backgroundColor: entry.color }} />
+            <span>{entry.label}</span>
+          </div>
         ))}
-      </g>
-    </svg>
+      </div>
+    </div>
   );
 }
 
