@@ -467,6 +467,20 @@ export function BlackMarketForecasterPage() {
     [results.freeMean, results.freeVariance, targetQuantity],
   );
 
+  const discountedUnitCost = results.discountedMean > 0 ? results.discountedCost / results.discountedMean : 0;
+  const regularUnitCost = results.regularMean > 0 ? results.regularCost / results.regularMean : 0;
+
+  const discountedCap = limitByCash ? factorCheap * results.discountedMean : results.discountedMean;
+  const regularCap = limitByCash ? factorAll * results.regularMean : results.regularMean;
+
+  const freeQtyUsed = Math.min(targetQuantity, results.freeMean);
+  const remainingAfterFree = Math.max(0, targetQuantity - freeQtyUsed);
+  const discountedQtyUsed = Math.min(remainingAfterFree, discountedCap);
+  const remainingAfterDiscounted = Math.max(0, remainingAfterFree - discountedQtyUsed);
+  const regularQtyUsed = Math.min(remainingAfterDiscounted, regularCap);
+  const optimalCostTotal = discountedQtyUsed * discountedUnitCost + regularQtyUsed * regularUnitCost;
+  const optimalUnfilled = Math.max(0, remainingAfterDiscounted - regularQtyUsed);
+
   const affordabilityNote = availableCash >= results.expectedCost
     ? "Covers expected Black Market Cash if you buy every appearance."
     : "Expected spend exceeds available Black Market Cash."
@@ -611,11 +625,29 @@ export function BlackMarketForecasterPage() {
                 : `${formatDecimal(results.expectedAppearances)} expected appearances`
             }
           />
-          <StatCard
-            label="Expected cost"
-            value={formatCurrency(cappedCostAll)}
-            helper={isCappedAll ? "Capped by available Black Market Cash." : affordabilityNote}
-          />
+          {analysisMode === "target" ? (
+            <div className="rounded-2xl border border-slate-800 bg-neutral-900/80 p-5 shadow-lg">
+              <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Optimal Cost</p>
+              <p className="mt-2 text-3xl font-bold text-slate-100">{formatCurrency(optimalCostTotal)}</p>
+              <div className="mt-2 space-y-1 text-sm text-slate-300">
+                <p>{formatNumber(Math.round(freeQtyUsed))} Free = {formatCurrency(0)}</p>
+                <p>{formatNumber(Math.round(discountedQtyUsed))} Discounted = {formatCurrency(discountedQtyUsed * discountedUnitCost)}</p>
+                <p>{formatNumber(Math.round(regularQtyUsed))} Regular = {formatCurrency(regularQtyUsed * regularUnitCost)}</p>
+                {optimalUnfilled > 0 ? (
+                  <p className="text-amber-300">Unfilled quantity: {formatNumber(Math.round(optimalUnfilled))}</p>
+                ) : null}
+              </div>
+              <p className="mt-2 text-xs text-slate-400">
+                {isCappedAll || isCappedCheap ? "Capped by available Black Market Cash." : "Uses expected odds; free, then discounted, then regular slots."}
+              </p>
+            </div>
+          ) : (
+            <StatCard
+              label="Expected cost"
+              value={formatCurrency(cappedCostAll)}
+              helper={isCappedAll ? "Capped by available Black Market Cash." : affordabilityNote}
+            />
+          )}
           <StatCard
             label="Cost per unit"
             value={cappedMeanAll > 0 ? formatCurrency(cappedCostPerUnit) : "—"}
