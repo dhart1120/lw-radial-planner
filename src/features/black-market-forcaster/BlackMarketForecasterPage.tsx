@@ -356,6 +356,23 @@ export function BlackMarketForecasterPage() {
   );
 
   const costPerUnit = results.mean > 0 ? results.expectedCost / results.mean : 0;
+
+  const paidCostAll = results.discountedCost + results.regularCost;
+  const paidCostCheap = results.discountedCost;
+  const factorAll = !limitByCash || paidCostAll === 0 ? 1 : Math.min(1, availableCash / paidCostAll);
+  const factorCheap = !limitByCash || paidCostCheap === 0 ? 1 : Math.min(1, availableCash / paidCostCheap);
+  const isCappedAll = factorAll < 1;
+  const isCappedCheap = factorCheap < 1;
+
+  const cappedMeanAll = results.freeMean + factorAll * (results.discountedMean + results.regularMean);
+  const cappedVarianceAll = results.freeVariance + factorAll * (results.discountedVariance + results.regularVariance);
+  const cappedCostAll = factorAll * paidCostAll;
+
+  const cappedMeanCheap = results.freeMean + factorCheap * results.discountedMean;
+  const cappedVarianceCheap = results.freeVariance + factorCheap * results.discountedVariance;
+  const cappedCostCheap = factorCheap * paidCostCheap;
+
+  const cappedCostPerUnit = cappedMeanAll > 0 ? cappedCostAll / cappedMeanAll : 0;
   const percentileQuantities = useMemo(
     () => buildPercentileQuantities(results.mean, results.variance),
     [results.mean, results.variance],
