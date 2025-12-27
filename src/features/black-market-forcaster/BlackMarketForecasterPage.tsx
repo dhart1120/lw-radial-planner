@@ -339,6 +339,7 @@ export function BlackMarketForecasterPage() {
   const [analysisMode, setAnalysisMode] = useState<AnalysisMode>("buy-all");
   const [targetQuantity, setTargetQuantity] = useState<number>(100);
   const [distributionScope, setDistributionScope] = useState<DistributionScope>("all");
+  const [limitByCash, setLimitByCash] = useState<boolean>(false);
 
   const setsPerEvent = eventDays * refreshesPerDay;
   const availableCash = startingCurrency + dailyIncome * eventDays;
@@ -393,8 +394,8 @@ export function BlackMarketForecasterPage() {
 
   const paidCostAll = results.discountedCost + results.regularCost;
   const paidCostCheap = results.discountedCost;
-  const factorAll = paidCostAll > 0 ? Math.min(1, availableCash / paidCostAll) : 1;
-  const factorCheap = paidCostCheap > 0 ? Math.min(1, availableCash / paidCostCheap) : 1;
+  const factorAll = !limitByCash || paidCostAll === 0 ? 1 : Math.min(1, availableCash / paidCostAll);
+  const factorCheap = !limitByCash || paidCostCheap === 0 ? 1 : Math.min(1, availableCash / paidCostCheap);
   const isCappedAll = factorAll < 1;
   const isCappedCheap = factorCheap < 1;
 
@@ -506,6 +507,15 @@ export function BlackMarketForecasterPage() {
                 />
               </div>
             ) : null}
+            <label className="mt-3 flex items-center gap-2 text-sm text-slate-200">
+              <input
+                type="checkbox"
+                checked={limitByCash}
+                onChange={(event) => setLimitByCash(event.target.checked)}
+                className="h-4 w-4 rounded border-slate-600 bg-neutral-900 text-sky-500 focus:ring-sky-500"
+              />
+              <span>Limit item quantity based on available Black Market Cash</span>
+            </label>
           </InputField>
 
           <InputField label="Event duration" helper="Days">
