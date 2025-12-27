@@ -168,7 +168,7 @@ function ProbabilityChart({ all, cheap, free }: ProbabilityChartProps) {
   const handleMouseLeave = () => setHoverQuantity(null);
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 pl-3">
       <svg viewBox={`0 0 ${width} ${height}`} className="h-72 w-full rounded-2xl border border-slate-800 bg-neutral-950/70 p-3 shadow-inner">
         <defs>
           <linearGradient id="probabilityGradient" x1="0" x2="0" y1="0" y2="1">
