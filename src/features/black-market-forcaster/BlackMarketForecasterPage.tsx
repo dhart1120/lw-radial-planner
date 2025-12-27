@@ -496,37 +496,17 @@ export function BlackMarketForecasterPage() {
   const optimalCostTotal = discountedQtyUsed * discountedUnitCost + regularQtyUsed * regularUnitCost;
   const optimalUnfilled = Math.max(0, remainingAfterDiscounted - regularQtyUsed);
 
-  const quantityBreakdown =
-    analysisMode === "target"
-      ? [
-          { label: "Free", value: formatDecimal(freeQtyUsed) },
-          { label: "Discounted", value: formatDecimal(discountedQtyUsed) },
-          { label: "Regular", value: formatDecimal(regularQtyUsed) },
-        ]
-      : [
-          { label: "Free", value: formatDecimal(results.freeMean) },
-          { label: "Discounted", value: formatDecimal(limitByCash ? results.discountedMean * factorCheap : results.discountedMean) },
-          { label: "Regular", value: formatDecimal(limitByCash ? results.regularMean * factorAll : results.regularMean) },
-        ];
+  const quantityBreakdown = [
+    { label: "Free", value: formatDecimal(results.freeMean) },
+    { label: "Discounted", value: formatDecimal(results.discountedMean) },
+    { label: "Regular", value: formatDecimal(results.regularMean) },
+  ];
 
-  const costBreakdown =
-    analysisMode === "target"
-      ? [
-          { label: "Free", value: formatCurrency(0) },
-          { label: "Discounted", value: formatCurrency(discountedQtyUsed * discountedUnitCost) },
-          { label: "Regular", value: formatCurrency(regularQtyUsed * regularUnitCost) },
-        ]
-      : [
-          { label: "Free", value: formatCurrency(0) },
-          {
-            label: "Discounted",
-            value: formatCurrency((limitByCash ? results.discountedCost * factorCheap : results.discountedCost)),
-          },
-          {
-            label: "Regular",
-            value: formatCurrency((limitByCash ? results.regularCost * factorAll : results.regularCost)),
-          },
-        ];
+  const costBreakdown = [
+    { label: "Free", value: formatCurrency(0) },
+    { label: "Discounted", value: formatCurrency(results.discountedCost) },
+    { label: "Regular", value: formatCurrency(results.regularCost) },
+  ];
 
   const unitCostBreakdown = [
     { label: "Free", value: formatCurrency(0) },
