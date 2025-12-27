@@ -470,12 +470,12 @@ export function BlackMarketForecasterPage() {
   const distributionCappedWarning = (distributionScope === "cheap" && isCappedCheap) || (distributionScope === "all" && isCappedAll);
 
   const chartAll = useMemo(
-    () => buildChartSeries(limitByCash ? cappedMeanAll : results.mean, limitByCash ? cappedVarianceAll : results.variance, targetQuantity),
-    [limitByCash, cappedMeanAll, cappedVarianceAll, results.mean, results.variance, targetQuantity],
+    () => buildChartSeries(results.mean, results.variance, targetQuantity),
+    [results.mean, results.variance, targetQuantity],
   );
   const chartCheap = useMemo(
-    () => buildChartSeries(limitByCash ? cappedMeanCheap : results.cheapMean, limitByCash ? cappedVarianceCheap : results.cheapVariance, targetQuantity),
-    [limitByCash, cappedMeanCheap, cappedVarianceCheap, results.cheapMean, results.cheapVariance, targetQuantity],
+    () => buildChartSeries(results.cheapMean, results.cheapVariance, targetQuantity),
+    [results.cheapMean, results.cheapVariance, targetQuantity],
   );
   const chartFree = useMemo(
     () => buildChartSeries(results.freeMean, results.freeVariance, targetQuantity),
