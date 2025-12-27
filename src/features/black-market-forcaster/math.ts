@@ -339,5 +339,9 @@ export function buildDistributionBuckets(mean: number, variance: number, targetQ
   return buildProbabilityBuckets(mean, Math.sqrt(variance), targetQuantity);
 }
 
+export function buildChartSeries(mean: number, variance: number, targetQuantity?: number) {
+  return buildChartPoints(mean, Math.sqrt(variance), targetQuantity);
+}
+
 export type ForecasterData = typeof forecasterData;
 export { forecasterData };

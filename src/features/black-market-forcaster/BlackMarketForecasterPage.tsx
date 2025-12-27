@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import {
   buildExpectedCostToTarget,
   buildDistributionBuckets,
+  buildChartSeries,
   buildPercentileQuantities,
   buildTargetCosts,
   forecasterData,
@@ -364,32 +365,42 @@ export function BlackMarketForecasterPage() {
     () =>
       buildTargetCosts(
         targetQuantity,
-        results.expectedCost,
+        limitByCash ? cappedCostAll : results.expectedCost,
         percentileQuantities,
         results.highCostPurchase,
       ),
-    [targetQuantity, results.expectedCost, percentileQuantities, results.highCostPurchase],
+    [targetQuantity, limitByCash, cappedCostAll, results.expectedCost, percentileQuantities, results.highCostPurchase],
   );
 
   const expectedCostToTarget = useMemo(
     () =>
       buildExpectedCostToTarget(
         targetQuantity,
-        results.mean,
-        results.expectedCost,
+        limitByCash ? cappedMeanAll : results.mean,
+        limitByCash ? cappedCostAll : results.expectedCost,
         results.highCostPurchase,
       ),
-    [results.expectedCost, results.highCostPurchase, results.mean, targetQuantity],
+    [limitByCash, cappedMeanAll, cappedCostAll, results.expectedCost, results.highCostPurchase, results.mean, targetQuantity],
   );
 
   const probabilityWithoutExpensive = useMemo(
-    () => probabilityWithoutHighCost(targetQuantity, results.cheapMean, results.cheapVariance),
-    [results.cheapMean, results.cheapVariance, targetQuantity],
+    () =>
+      probabilityWithoutHighCost(
+        targetQuantity,
+        limitByCash ? cappedMeanCheap : results.cheapMean,
+        limitByCash ? cappedVarianceCheap : results.cheapVariance,
+      ),
+    [limitByCash, cappedMeanCheap, cappedVarianceCheap, results.cheapMean, results.cheapVariance, targetQuantity],
   );
 
   const probabilityAllSources = useMemo(
-    () => probabilityToHitTarget(targetQuantity, results.mean, results.variance),
-    [results.mean, results.variance, targetQuantity],
+    () =>
+      probabilityToHitTarget(
+        targetQuantity,
+        limitByCash ? cappedMeanAll : results.mean,
+        limitByCash ? cappedVarianceAll : results.variance,
+      ),
+    [limitByCash, cappedMeanAll, cappedVarianceAll, results.mean, results.variance, targetQuantity],
   );
 
   const paidCostAll = results.discountedCost + results.regularCost;
@@ -414,13 +425,26 @@ export function BlackMarketForecasterPage() {
       return buildDistributionBuckets(results.freeMean, results.freeVariance, targetQuantity);
     }
     if (distributionScope === "cheap") {
-      return buildDistributionBuckets(cappedMeanCheap, cappedVarianceCheap, targetQuantity);
+      return buildDistributionBuckets(
+        limitByCash ? cappedMeanCheap : results.cheapMean,
+        limitByCash ? cappedVarianceCheap : results.cheapVariance,
+        targetQuantity,
+      );
     }
-    return buildDistributionBuckets(cappedMeanAll, cappedVarianceAll, targetQuantity);
+    return buildDistributionBuckets(
+      limitByCash ? cappedMeanAll : results.mean,
+      limitByCash ? cappedVarianceAll : results.variance,
+      targetQuantity,
+    );
   }, [
     distributionScope,
+    limitByCash,
     results.freeMean,
     results.freeVariance,
+    results.cheapMean,
+    results.cheapVariance,
+    results.mean,
+    results.variance,
     cappedMeanCheap,
     cappedVarianceCheap,
     cappedMeanAll,
@@ -429,6 +453,19 @@ export function BlackMarketForecasterPage() {
   ]);
 
   const distributionCappedWarning = (distributionScope === "cheap" && isCappedCheap) || (distributionScope === "all" && isCappedAll);
+
+  const chartAll = useMemo(
+    () => buildChartSeries(limitByCash ? cappedMeanAll : results.mean, limitByCash ? cappedVarianceAll : results.variance, targetQuantity),
+    [limitByCash, cappedMeanAll, cappedVarianceAll, results.mean, results.variance, targetQuantity],
+  );
+  const chartCheap = useMemo(
+    () => buildChartSeries(limitByCash ? cappedMeanCheap : results.cheapMean, limitByCash ? cappedVarianceCheap : results.cheapVariance, targetQuantity),
+    [limitByCash, cappedMeanCheap, cappedVarianceCheap, results.cheapMean, results.cheapVariance, targetQuantity],
+  );
+  const chartFree = useMemo(
+    () => buildChartSeries(results.freeMean, results.freeVariance, targetQuantity),
+    [results.freeMean, results.freeVariance, targetQuantity],
+  );
 
   const affordabilityNote = availableCash >= results.expectedCost
     ? "Covers expected Black Market Cash if you buy every appearance."
@@ -704,13 +741,13 @@ export function BlackMarketForecasterPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-800 bg-neutral-900/70 shadow-lg">
+          <div className="rounded-2xl border border-slate-800 bg-neutral-900/70 shadow-lg">
           <div className="border-b border-slate-800 px-5 py-4">
             <p className="text-sm uppercase tracking-[0.25em] text-slate-400">Cumulative probability</p>
             <p className="text-sm text-slate-400">P(quantity ≥ X) using normal CDF with continuity correction.</p>
           </div>
           <div className="p-4">
-            <ProbabilityChart all={results.chartAll} cheap={results.chartCheap} free={results.chartFree} />
+            <ProbabilityChart all={chartAll} cheap={chartCheap} free={chartFree} />
           </div>
         </div>
       </section>
